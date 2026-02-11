@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PROMPT LAB</title>
+
+  <!-- Tipografía (opcional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      /* ✅ MODO CLARO (sin cambiar estructura) */
+      --bg: #ffffff;
+      --bg2:#f6fff0;
+      --text:#0b0f14;
+      --muted:#4b5563;
+
+      /* verde limón (se mantiene) */
+      --gold:#7CFF00;
+      --gold2:#B4FF4D;
+
+      /* superficies claras con transparencia */
+      --card: rgba(255,255,255,.72);
+      --stroke: rgba(0,0,0,.08);
+      --shadow: 0 20px 60px rgba(0,0,0,.12);
+      --radius: 22px;
+      --container: 1140px;
+    }
+
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+      /* ✅ Fondo claro: blanco + verde claro (misma idea de gradientes) */
+      background:
+        radial-gradient(1200px 700px at 10% 20%, rgba(124,255,0,.22), transparent 55%),
+        radial-gradient(900px 600px at 85% 15%, rgba(180,255,77,.18), transparent 55%),
+        radial-gradient(900px 800px at 85% 85%, rgba(124,255,0,.14), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      color: var(--text);
+      overflow-x:hidden;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .container{ width:min(var(--container), calc(100% - 48px)); margin:0 auto; }
+
+    /* Tipografías (igual que tu versión) */
+    h1, h2, h3,
+    .brand-name strong,
+    .nav a,
+    label{
+      font-family: "Courier New", Courier, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    p, span,
+    .lead,
+    .brand-name span,
+    .section-title p,
+    .card p,
+    .hero-card p,
+    .metric span,
+    .note,
+    input, textarea,
+    .btn{
+      font-family: "Stretch Pro", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* Topbar */
+    .topbar{
+      position:fixed;
+      top:0; left:0; right:0;
+      z-index:50;
+      backdrop-filter: blur(10px);
+
+      /* ✅ claro */
+      background: rgba(255,255,255,.70);
+      border-bottom: 1px solid var(--stroke);
+    }
+    .topbar-inner{
+      height:78px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:160px;
+    }
+    .logo{
+      width:42px; height:42px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      background: radial-gradient(circle at 35% 30%, rgba(180,255,77,.35), rgba(124,255,0,.18));
+      border:1px solid rgba(124,255,0,.35);
+      box-shadow: 0 10px 30px rgba(124,255,0,.14);
+      letter-spacing:.12em;
+      font-weight:800;
+      color: #0b0f14;
+      user-select:none;
+    }
+    .brand-name{
+      display:flex;
+      flex-direction:column;
+      line-height:1.05;
+    }
+    .brand-name strong{ font-size:14px; letter-spacing:.18em; text-transform:uppercase; }
+    .brand-name span{ font-size:12px; color:var(--muted); }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap:22px;
+    }
+    .nav a{
+      font-size:13px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+
+      /* ✅ texto oscuro */
+      color: rgba(11,15,20,.82);
+
+      position:relative;
+      padding:10px 4px;
+    }
+    .nav a::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:3px;
+      transform:translateX(-50%);
+      width:0;
+      height:2px;
+      border-radius:999px;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      transition: width .2s ease;
+      opacity:.95;
+    }
+    .nav a:hover::after,
+    .nav a.active::after{
+      width:70%;
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:160px;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 16px;
+      border-radius:999px;
+      font-weight:700;
+      letter-spacing:.08em;
+      font-size:12px;
+
+      /* ✅ claro */
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.55);
+      color: var(--text);
+
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.70);
+      border-color: rgba(0,0,0,.12);
+    }
+    .btn-primary{
+      border:1px solid rgba(124,255,0,.45);
+      background: radial-gradient(circle at 30% 20%, rgba(180,255,77,.45), rgba(124,255,0,.18));
+      box-shadow: 0 14px 40px rgba(124,255,0,.14);
+      color: #0b0f14;
+    }
+
+    .hamburger{
+      width:44px; height:44px;
+      border-radius:14px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+    }
+    .hamburger span, .hamburger span::before, .hamburger span::after{
+      content:"";
+      display:block;
+      width:18px; height:2px;
+
+      /* ✅ oscuro */
+      background: rgba(11,15,20,.85);
+
+      border-radius:999px;
+      position:relative;
+      transition: transform .2s ease, top .2s ease, opacity .2s ease;
+    }
+    .hamburger span::before{ position:absolute; top:-6px; left:0; }
+    .hamburger span::after{ position:absolute; top:6px; left:0; }
+    .hamburger.is-open span{ background: transparent; }
+    .hamburger.is-open span::before{ top:0; transform: rotate(45deg); }
+    .hamburger.is-open span::after{ top:0; transform: rotate(-45deg); }
+
+    /* Mobile nav panel */
+    .mobile-panel{
+      display:none;
+      border-top: 1px solid var(--stroke);
+      padding:14px 0 18px;
+
+      /* ✅ claro */
+      background: rgba(255,255,255,.70);
+      backdrop-filter: blur(10px);
+    }
+    .mobile-panel a{
+      display:block;
+      padding:12px 6px;
+      font-size:13px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+
+      /* ✅ oscuro */
+      color: rgba(11,15,20,.84);
+    }
+    .mobile-panel a + a{ border-top:1px solid rgba(0,0,0,.06); }
+
+    /* Hero */
+    main{ padding-top:78px; }
+
+    .hero{
+      position:relative;
+      min-height: calc(100vh - 78px);
+      display:flex;
+      align-items:center;
+      overflow:hidden;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:42px;
+      align-items:center;
+      padding: 64px 0;
+      position:relative;
+      z-index:2;
+    }
+
+    /* Abstract shapes (solo colores ya están OK en claro) */
+    .shape{
+      position:absolute;
+      inset:auto;
+      filter: blur(.0px);
+      opacity: .95;
+      z-index:1;
+      pointer-events:none;
+    }
+    .shape.one{
+      width:680px; height:520px;
+      left:-180px; top:110px;
+      background:
+        radial-gradient(closest-side at 35% 40%, rgba(180,255,77,.35), rgba(124,255,0,.14) 60%, transparent 70%),
+        radial-gradient(closest-side at 60% 60%, rgba(124,255,0,.18), transparent 70%);
+      border-radius: 55% 45% 58% 42% / 52% 48% 52% 48%;
+      transform: rotate(-10deg);
+    }
+    .shape.two{
+      width:760px; height:560px;
+      right:-260px; top:90px;
+      background:
+        radial-gradient(closest-side at 45% 40%, rgba(124,255,0,.16), transparent 70%),
+        radial-gradient(closest-side at 55% 55%, rgba(180,255,77,.10), transparent 72%);
+      border-radius: 46% 54% 44% 56% / 52% 44% 56% 48%;
+      transform: rotate(8deg);
+    }
+
+    .dots{
+      position:absolute;
+      width:120px; height:120px;
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap:10px;
+      opacity:.35;
+      z-index:1;
+      pointer-events:none;
+    }
+    .dots i{
+      width:6px; height:6px;
+      border-radius:999px;
+      background: rgba(124,255,0,.45);
+      box-shadow: 0 0 18px rgba(124,255,0,.18);
+    }
+    .dots.left{ left:90px; top:160px; transform: rotate(8deg); }
+    .dots.right{ right:120px; bottom:160px; transform: rotate(-10deg); }
+
+    .waves{
+      position:absolute;
+      inset:0;
+      opacity:.35;
+      z-index:1;
+      pointer-events:none;
+    }
+
+    .bg-codes{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:1;
+    }
+    .bg-codes span{
+      position:absolute;
+      font-size:22px;
+      color: rgba(124,255,0,.18);
+      font-weight:600;
+      letter-spacing:2px;
+      user-select:none;
+    }
+    .bg-codes span:nth-child(1){ top:18%; left:12%; }
+    .bg-codes span:nth-child(2){ top:65%; left:20%; }
+    .bg-codes span:nth-child(3){ top:30%; right:15%; }
+    .bg-codes span:nth-child(4){ bottom:18%; right:10%; }
+
+    .kicker{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(124,255,0,.25);
+      background: rgba(255,255,255,.55);
+      color: rgba(11,15,20,.78);
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .kicker .pill{
+      width:8px; height:8px;
+      border-radius:999px;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      box-shadow: 0 0 18px rgba(124,255,0,.22);
+    }
+
+    h1{
+      margin:18px 0 12px;
+      font-size: clamp(38px, 4.2vw, 58px);
+      line-height:1.02;
+      letter-spacing:.02em;
+    }
+    h1 .accent{
+      color: #0b0f14;
+      text-shadow: 0 0 40px rgba(124,255,0,.10);
+    }
+
+    .lead{
+      margin: 0 0 22px;
+      color: rgba(11,15,20,.72);
+      max-width: 52ch;
+      font-size: 15px;
+      line-height:1.7;
+    }
+
+    .hero-cta{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    /* Cards */
+    .hero-card{
+      background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.55));
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      padding:22px;
+      box-shadow: var(--shadow);
+    }
+    .hero-card h3{
+      margin:0 0 10px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-size:12px;
+      color: rgba(11,15,20,.75);
+    }
+    .hero-card p{
+      margin:0 0 18px;
+      color: rgba(11,15,20,.72);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .metrics{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    .metric{
+      padding:14px 12px;
+      border-radius:18px;
+      border:1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.55);
+    }
+    .metric b{ display:block; font-size:16px; color: rgba(11,15,20,.88); }
+    .metric span{ display:block; margin-top:4px; font-size:12px; color: rgba(11,15,20,.70); }
+
+    section{
+      padding: 78px 0;
+      position:relative;
+      z-index:2;
+    }
+    .section-title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom: 18px;
+    }
+    .section-title h2{
+      margin:0;
+      font-size: 26px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+    }
+    .section-title p{
+      margin:0;
+      color: rgba(11,15,20,.70);
+      max-width: 62ch;
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:16px;
+      margin-top:18px;
+    }
+    .card{
+      padding:20px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.55));
+      border:1px solid var(--stroke);
+      box-shadow: 0 14px 50px rgba(0,0,0,.10);
+    }
+    .card .icon{
+      width:44px; height:44px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(124,255,0,.35);
+      background: rgba(124,255,0,.14);
+      color: rgba(11,15,20,.88);
+      margin-bottom:12px;
+      font-weight:800;
+    }
+    .card h3{ margin:0 0 8px; font-size:16px; letter-spacing:.04em; }
+    .card p{ margin:0; color: rgba(11,15,20,.72); line-height:1.65; font-size:14px; }
+
+    .about{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+      align-items:stretch;
+      margin-top:18px;
+    }
+    .about .panel{
+      padding:22px;
+      border-radius: var(--radius);
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.62);
+      box-shadow: 0 14px 50px rgba(0,0,0,.08);
+    }
+    .about ul{
+      margin:12px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:10px;
+    }
+    .about li{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      color: rgba(11,15,20,.74);
+      line-height:1.6;
+      font-size:14px;
+    }
+    .check{
+      width:18px; height:18px;
+      border-radius:6px;
+      border:1px solid rgba(124,255,0,.35);
+      background: rgba(124,255,0,.14);
+      margin-top:2px;
+      position:relative;
+      flex:0 0 18px;
+    }
+    .check:after{
+      content:"";
+      position:absolute;
+      left:5px; top:3px;
+      width:6px; height:10px;
+      border-right:2px solid rgba(11,15,20,.88);
+      border-bottom:2px solid rgba(11,15,20,.88);
+      transform: rotate(40deg);
+    }
+
+    .form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:18px;
+    }
+    .field{ display:flex; flex-direction:column; gap:8px; }
+    label{
+      font-size:12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color: rgba(11,15,20,.70);
+    }
+    input, textarea{
+      width:100%;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.70);
+      color: var(--text);
+      outline:none;
+      font: inherit;
+    }
+    textarea{ min-height:130px; resize: vertical; grid-column: 1 / -1; }
+    input:focus, textarea:focus{
+      border-color: rgba(124,255,0,.40);
+      box-shadow: 0 0 0 4px rgba(124,255,0,.18);
+    }
+
+    .form-actions{
+      grid-column: 1 / -1;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .note{
+      color: rgba(11,15,20,.62);
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    footer{
+      padding: 26px 0 40px;
+      border-top:1px solid rgba(0,0,0,.06);
+      color: rgba(11,15,20,.62);
+      font-size:13px;
+    }
+
+    @media (max-width: 980px){
+      .hero-grid{ grid-template-columns: 1fr; padding: 44px 0; }
+      .about{ grid-template-columns: 1fr; }
+      .grid{ grid-template-columns: 1fr; }
+      .metrics{ grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 760px){
+      .nav{ display:none; }
+      .hamburger{ display:flex; }
+      .mobile-panel{ display:none; }
+      .mobile-panel.is-open{ display:block; }
+      .actions .btn{ display:none; }
+      .actions .btn-primary{ display:inline-flex; }
+      .form{ grid-template-columns: 1fr; }
+      .dots.left{ left:22px; top:140px; }
+      .dots.right{ right:22px; bottom:160px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="topbar-inner">
+        <a class="brand" href="#casa" aria-label="Ir a Casa">
+          <div class="logo">PL</div>
+          <div class="brand-name">
+            <strong>PROMPT LAB >_</strong>
+            <span>Anuncios · Posters · Video</span>
+          </div>
+        </a>
+
+        <nav class="nav" aria-label="Navegación principal">
+          <a href="#casa" class="active">CASA</a>
+          <a href="#servicios">SERVICIOS</a>
+          <a href="#quienes">QUIENES SOMOS</a>
+          <a href="#contactanos">CONTACTANOS</a>
+        </nav>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="#contactanos">CONTACTANOS</a>
+
+          <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false">
+            <span></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="mobile-panel" id="mobilePanel">
+        <a href="#casa">CASA</a>
+        <a href="#servicios">SERVICIOS</a>
+        <a href="#quienes">QUIENES SOMOS</a>
+        <a href="#contactanos">CONTACTANOS</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="casa">
+      <div class="shape one"></div>
+      <div class="shape two"></div>
+
+      <div class="bg-codes" aria-hidden="true">
+        <span>>_</span><span>>_</span><span>>_</span><span>>_</span>
+      </div>
+
+      <div class="dots left" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+
+      <div class="dots right" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+
+      <svg class="waves" viewBox="0 0 1200 700" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M-50,180 C150,120 260,260 420,210 C590,160 650,40 820,120 C1000,210 1090,70 1280,130"
+              fill="none" stroke="rgba(124,255,0,.22)" stroke-width="2"/>
+        <path d="M-80,520 C150,430 300,610 470,520 C650,420 700,650 880,560 C1040,480 1120,640 1290,560"
+              fill="none" stroke="rgba(124,255,0,.18)" stroke-width="2"/>
+      </svg>
+
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="kicker"><span class="pill"></span>Contenido premium con IA</div>
+
+            <h1>
+              Anuncios, posters y videos<br>
+              <span class="accent">elegantes</span> para vender más
+            </h1>
+
+            <p class="lead">
+              Producción rápida, estética oscura y limpia, entregables listos para Instagram, TikTok y campañas.
+              Mantén consistencia de marca y escala contenido sin subir costos.
+            </p>
+
+            <div class="hero-cta">
+              <a class="btn btn-primary" href="#contactanos">CONOCER YA</a>
+              <a class="btn" href="#servicios">VER SERVICIOS</a>
+            </div>
+          </div>
+
+          <aside class="hero-card">
+            <h3>RESULTADOS</h3>
+            <p>
+              Paquetes por volumen y piezas de alto impacto. Diseños Y tipografía clara, visual moderno.
+            </p>
+
+            <div class="metrics">
+              <div class="metric">
+                <b>24–72h</b>
+                <span>Entrega</span>
+              </div>
+              <div class="metric">
+                <b>+10x</b>
+                <span>Variantes</span>
+              </div>
+              <div class="metric">
+                <b>1:1 / 9:16</b>
+                <span>Formatos</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="servicios">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2>SERVICIOS</h2>
+            <p>Selecciona lo que necesitas. Puedes combinar piezas para una campaña completa.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <div class="icon">AD</div>
+            <h3>Anuncios (Meta / TikTok)</h3>
+            <p>Creativos listos para pauta: hooks, variantes, adaptaciones por audiencia y formato.</p>
+          </div>
+
+          <div class="card">
+            <div class="icon">PS</div>
+            <h3>Posters y Flyers</h3>
+            <p>Diseños elegantes en estilo oscuro con acentos dorados, listos para redes y pantallas.</p>
+          </div>
+
+          <div class="card">
+            <div class="icon">VD</div>
+            <h3>Video Reels con IA</h3>
+            <p>Reels con ritmo, transiciones limpias, subtítulos, CTA y formato 9:16 optimizado.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quienes">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2>QUIENES SOMOS</h2>
+            <p>Un estudio creativo enfocado en ventas: estética, velocidad y consistencia de marca.</p>
+          </div>
+        </div>
+
+        <div class="about">
+          <div class="panel">
+            <h3 style="margin:0 0 10px; letter-spacing:.10em; text-transform:uppercase; color: rgba(11,15,20,.75); font-size:12px;">
+              Enfoque
+            </h3>
+            <p style="margin:0; color: rgba(11,15,20,.72); line-height:1.7; font-size:14px;">
+              Creamos contenido con inteligencia artificial sin perder el estándar de una marca premium:
+              composición, tipografías, contraste y narrativa para convertir.
+            </p>
+            <ul>
+              <li><span class="check"></span> Identidad visual consistente (dorados, negros, luces sutiles)</li>
+              <li><span class="check"></span> Variantes por campaña: A/B hooks, copies y formatos</li>
+              <li><span class="check"></span> Entrega lista para publicar (IG, TikTok, historias, posts)</li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <h3 style="margin:0 0 10px; letter-spacing:.10em; text-transform:uppercase; color: rgba(11,15,20,.75); font-size:12px;">
+              Ideal para
+            </h3>
+            <ul style="margin:0; padding:0; list-style:none; display:grid; gap:10px;">
+              <li style="display:flex; gap:10px; align-items:flex-start;">
+                <span class="check"></span>
+                <span>Discotecas, eventos y conciertos.</span>
+              </li>
+              <li style="display:flex; gap:10px; align-items:flex-start;">
+                <span class="check"></span>
+                <span>Restaurantes, tiendas y marcas personales.</span>
+              </li>
+              <li style="display:flex; gap:10px; align-items:flex-start;">
+                <span class="check"></span>
+                <span>Emprendimientos que necesitan volumen de contenido.</span>
+              </li>
+            </ul>
+
+            <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+              <a class="btn btn-primary" href="#contactanos">CONTACTANOS</a>
+              <a class="btn" href="#servicios">VER PAQUETES</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contactanos">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2>CONTACTANOS</h2>
+            <p>Envíanos tu idea y te respondemos con propuesta y tiempos de entrega.</p>
+          </div>
+        </div>
+
+        <form class="card" onsubmit="return false;">
+          <div class="form">
+            <div class="field">
+              <label for="nombre">Nombre</label>
+              <input id="nombre" name="nombre" placeholder="Tu nombre" autocomplete="name" />
+            </div>
+
+            <div class="field">
+              <label for="marca">Marca / Negocio</label>
+              <input id="marca" name="marca" placeholder="Nombre de la marca" />
+            </div>
+
+            <div class="field">
+              <label for="canal">Canal</label>
+              <input id="canal" name="canal" placeholder="Instagram / TikTok / Facebook " />
+            </div>
+
+            <div class="field">
+              <label for="presupuesto">Presupuesto (opcional)</label>
+              <input id="presupuesto" name="presupuesto" placeholder="$" inputmode="decimal" />
+            </div>
+
+            <div class="field">
+              <label for="mensaje">Mensaje</label>
+              <textarea id="mensaje" name="mensaje" placeholder="Qué necesitas: anuncios, posters, videos…"></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" id="btnWhatsApp" type="button">ENVIAR POR WHATSAPP</button>
+              <button class="btn" id="btnCopiar" type="button">COPIAR MENSAJE</button>
+              <span class="note">Aqui seria conectar un charbot con n8n por ejemplo con: (variable <b>WHATSAPP_NUMBER</b>).</span>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        © <span id="year"></span> PROMPT LAB — Contenido premium con IA.
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    const WHATSAPP_NUMBER = "593000000000"; // <- CAMBIAR POR NUMERO OJITO)
+
+    const hamburger = document.getElementById("hamburger");
+    const mobilePanel = document.getElementById("mobilePanel");
+
+    hamburger.addEventListener("click", () => {
+      const open = mobilePanel.classList.toggle("is-open");
+      hamburger.classList.toggle("is-open", open);
+      hamburger.setAttribute("aria-expanded", String(open));
+    });
+
+    [...mobilePanel.querySelectorAll("a")].forEach(a => {
+      a.addEventListener("click", () => {
+        mobilePanel.classList.remove("is-open");
+        hamburger.classList.remove("is-open");
+        hamburger.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    const navLinks = [...document.querySelectorAll(".nav a")];
+    const sections = ["casa","servicios","quienes","contactanos"].map(id => document.getElementById(id));
+
+    const setActive = (id) => {
+      navLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + id));
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter(e => e.isIntersecting)
+        .sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible?.target?.id) setActive(visible.target.id);
+    }, { root: null, threshold: [0.25, 0.45, 0.6] });
+
+    sections.forEach(s => s && observer.observe(s));
+
+    const q = (id) => document.getElementById(id);
+    const btnWhatsApp = q("btnWhatsApp");
+    const btnCopiar = q("btnCopiar");
+
+    function buildMessage(){
+      const nombre = (q("nombre").value || "").trim();
+      const marca = (q("marca").value || "").trim();
+      const canal = (q("canal").value || "").trim();
+      const presupuesto = (q("presupuesto").value || "").trim();
+      const mensaje = (q("mensaje").value || "").trim();
+
+      const lines = [
+        "Hola, quisiera saber sobre sus servicios.",
+        nombre ? `Nombre: ${nombre}` : null,
+        marca ? `Marca: ${marca}` : null,
+        canal ? `Canal: ${canal}` : null,
+        presupuesto ? `Presupuesto: ${presupuesto}` : null,
+        mensaje ? `Detalle: ${mensaje}` : null
+      ].filter(Boolean);
+
+      return lines.join("\n");
+    }
+
+    btnWhatsApp.addEventListener("click", () => {
+      const text = encodeURIComponent(buildMessage());
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+    });
+
+    btnCopiar.addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(buildMessage());
+        btnCopiar.textContent = "COPIADO ✓";
+        setTimeout(() => btnCopiar.textContent = "COPIAR MENSAJE", 1400);
+      }catch(e){
+        alert("No se pudo copiar. Copia manualmente el texto del formulario.");
+      }
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
